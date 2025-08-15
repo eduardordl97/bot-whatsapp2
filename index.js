@@ -19,7 +19,8 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log('🌐 Servidor web iniciado en puerto 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
 
 // Inicializar cliente de WhatsApp con guardado de sesión
 const client = new Client({
@@ -50,7 +51,7 @@ client.on('qr', async qr => {
 client.on('ready', () => {
     console.log('✅ Bot de WhatsApp listo y conectado.');
 
-    cron.schedule('25 13 * * *', () => {
+    cron.schedule('35 13 * * *', () => {
         let contactos = ['5215562259536']; 
         contactos.forEach(num => {
             client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenos días!');
