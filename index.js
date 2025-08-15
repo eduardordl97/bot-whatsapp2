@@ -51,10 +51,10 @@ client.on('qr', async qr => {
 client.on('ready', () => {
     console.log('✅ Bot de WhatsApp listo y conectado.');
 
-    cron.schedule('05 14 * * *', () => {
+    cron.schedule('20 14 * * *', () => {
         let contactos = ['5215562259536']; 
         contactos.forEach(num => {
-            client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenas tardes Laloko, son las 2:05 p.m.!');
+            client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenas tardes Laloko, son las 2:20 p.m.!');
         });
         console.log('📤 Mensajes programados enviados.');
     });
