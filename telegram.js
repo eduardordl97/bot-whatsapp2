@@ -38,9 +38,15 @@ bot.onText(/\/start/, (msg) => {
 
 // ======== Mensajes programados ========
 // Ejemplo: enviar mensaje el día 15 de cada mes a las 3:00 PM
-cron.schedule('30 15 15 * *', () => {
-    enviarMensajePersonalizado('este es un recordatorio automático mi todo tibio 🥶');
+cron.schedule('0 * * * *', () => {
+    const now = new Date();
+    const horaActual = now.toLocaleTimeString(); // HH:MM:SS
+
+    enviarMensajePersonalizado(`este es un recordatorio automático de que son las ${horaActual}, mi todo tibio 🥶`);
+
+    console.log(`⏰ Mensaje enviado a todos los contactos a las ${horaActual}`);
 });
+
 
 // ======== Servidor web para verificar estado ========
 app.get('/status', (req, res) => {
