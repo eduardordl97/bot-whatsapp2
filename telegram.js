@@ -75,7 +75,7 @@ cron.schedule('0 * * * *', () => {
     });
 
     enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶  
-                                    Hey, son las ⏰ ${horaActual} y tu sigues todo tibio 🔥  
+                                    Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥  
                                     No te duermas, ¡es hora de chaquetiarse! ⚡😎`);
     console.log(`⏰ Mensaje enviado a todos los contactos generales a las ${horaActual}`);
 });
