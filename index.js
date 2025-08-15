@@ -10,10 +10,10 @@ let latestQR = null;
 // Puerto asignado por Render
 const PORT = process.env.PORT || 3000;
 
-// Carpeta persistente para la sesión
-const sessionPath = '/mnt/data/wwebjs_session';
+// Carpeta temporal para la sesión (Render Free)
+const sessionPath = '/tmp/wwebjs_session';
 
-// Crear carpeta si no existe
+// Crear carpeta temporal si no existe
 if (!fs.existsSync(sessionPath)) {
     fs.mkdirSync(sessionPath, { recursive: true });
     console.log(`✅ Carpeta de sesión creada en ${sessionPath}`);
@@ -39,7 +39,7 @@ app.get('/status', async (req, res) => {
 
 app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
 
-// Inicializar cliente con sesión persistente
+// Inicializar cliente con sesión temporal
 const client = new Client({
     authStrategy: new LocalAuth({ dataPath: sessionPath }),
     puppeteer: {
@@ -57,9 +57,9 @@ const client = new Client({
     }
 });
 
-// Generar QR
+// Evento QR
 client.on('qr', async qr => {
-    if (!latestQR) { // solo actualizar si no hay QR válido
+    if (!latestQR) {
         try {
             latestQR = await QRCode.toDataURL(qr, {
                 errorCorrectionLevel: 'H',
@@ -109,13 +109,13 @@ function reconnect() {
     }, 10000);
 }
 
-// Mensaje programado: 2:40 PM
-cron.schedule('40 14 * * *', () => {
+// Mensaje programado: 2:45 PM
+cron.schedule('45 14 * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenas tardes Laloko, son las 2:40 p.m.!');
+        client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenas tardes Laloko, son las 2:45 p.m.!');
     });
-    console.log('📤 Mensajes programados enviados a la 2:40 PM.');
+    console.log('📤 Mensajes programados enviados a la 2:45 PM.');
 });
 
 // Inicializar cliente
