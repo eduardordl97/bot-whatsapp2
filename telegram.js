@@ -9,21 +9,89 @@ const PORT = process.env.PORT || 3000;
 const token = '8417137357:AAEWmHKUa4hkN7WqdeTtxu0bT5V0PlvBwNk';
 const bot = new TelegramBot(token, { polling: true });
 
-// ======== JSON de contactos dentro del código ========
-const contactos = [
+// ======== Contactos generales (mensajes horarios) ========
+const contactosGenerales = [
     { "nombre": "Eduardo", "id": 1034833893 },
-    { "nombre": "Memo", "id": 1591483148 }
-    // { "nombre": "Carlos", "id": 192837465 }
+    { "nombre": "Memo", "id": 1591483148 },
+    { "nombre": "Miguel", "id": 6520635694 },
+    { "nombre": "Jacob", "id": 5437780923 },
+    { "nombre": "Serch", "id": 2097823501 }
+    
 ];
 
-// ======== Función para enviar mensaje personalizado a todos los contactos ========
+// ======== Contactos Spotify (rotación mensual) ========
+const contactosSpotify = [
+    { "nombre": "Jacob", "id": 5437780923 },
+    { "nombre": "Mando", "id": 1034833893 },
+    { "nombre": "Miguel", "id": 6520635694 },
+    { "nombre": "Mike", "id": 6520635694 },
+    { "nombre": "Eduardo", "id": 1034833893 },
+    { "nombre": "Memo", "id": 1591483148 }
+];
+
+// ======== Función para enviar mensaje personalizado a todos los contactos generales ========
 function enviarMensajePersonalizado(textoBase) {
-    contactos.forEach(contacto => {
+    contactosGenerales.forEach(contacto => {
         const mensaje = `Hola ${contacto.nombre}, ${textoBase}`;
         bot.sendMessage(contacto.id, mensaje);
     });
-    console.log('📤 Mensajes personalizados enviados a todos los contactos del JSON interno');
+    console.log('📤 Mensajes personalizados enviados a todos los contactos generales');
 }
+
+// ======== Función para enviar recordatorio de Spotify según turno ========
+const ordenSpotify = ["Memo", "Eduardo", "Miguel", "Jacob", "Mando", "Mike"];
+let indiceSpotify = 0;
+
+function enviarSpotify() {
+    const persona = ordenSpotify[indiceSpotify];
+    const contacto = contactosSpotify.find(c => c.nombre === persona);
+
+    if (contacto) {
+        const mensaje = `🎵 ¡Hey ${contacto.nombre}! 😎\n\n` +
+                        `Este mes te toca ser el **héroe de Spotify** 🤑\n` +
+                        `No olvides pagar antes del 28 para que todos sigamos escuchando 🎶\n` +
+                        `¡Tú puedes! 💪✨`;
+
+        bot.sendMessage(contacto.id, mensaje, { parse_mode: 'Markdown' });
+        console.log(`✅ Mensaje divertido de Spotify enviado a ${contacto.nombre} (${contacto.id})`);
+    } else {
+        console.log(`❌ No se encontró el contacto ${persona} en la lista de Spotify`);
+    }
+
+    // Actualizar índice para el próximo mes
+    indiceSpotify = (indiceSpotify + 1) % ordenSpotify.length;
+}
+
+// ======== Mensajes programados ========
+
+// Mensaje cada hora a contactos generales
+cron.schedule('0 * * * *', () => {
+    const now = new Date();
+    const horaActual = now.toLocaleTimeString('es-MX', {
+        timeZone: 'America/Mexico_City',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true // formato 12 horas con AM/PM
+    });
+
+    enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶  
+                                    Hey, son las ⏰ ${horaActual} y tu sigues todo tibio 🔥  
+                                    No te duermas, ¡es hora de chaquetiarse! ⚡😎`);
+    console.log(`⏰ Mensaje enviado a todos los contactos generales a las ${horaActual}`);
+});
+
+
+// Mensaje de Spotify cada 26 del mes a las 10:00 AM CDMX
+cron.schedule('0 10 26 * *', () => {
+    const now = new Date();
+    const horaActual = now.toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City' });
+
+    console.log(`⏰ Ejecutando recordatorio de Spotify a las ${horaActual}`);
+    enviarSpotify();
+}, {
+    scheduled: true,
+    timezone: "America/Mexico_City"
+});
 
 // ======== Mensaje de bienvenida y mostrar chat ID ========
 bot.onText(/\/start/, (msg) => {
@@ -32,27 +100,16 @@ bot.onText(/\/start/, (msg) => {
 
     bot.sendMessage(chatId, '¡Hola! Bot iniciado y listo para enviar mensajes mensuales.');
 
-    // Mostrar en consola el chat ID de quien envió /start
     console.log(`👤 Usuario que envió /start: ${nombre} (ID: ${chatId})`);
 });
 
-// ======== Mensajes programados ========
-// Ejemplo: enviar mensaje el día 15 de cada mes a las 3:00 PM
-cron.schedule('10 * * * *', () => {
-    const now = new Date();
-    const horaActual = now.toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City' });
-    console.log(`⏰ Mensaje enviado a todos los contactos a las ${horaActual}`);
-
-
-    enviarMensajePersonalizado(`este es un recordatorio automático de que son las ${horaActual}, mi todo tibio 🥶`);
-
-    console.log(`⏰ Mensaje enviado a todos los contactos a las ${horaActual}`);
-});
-
-
 // ======== Servidor web para verificar estado ========
 app.get('/status', (req, res) => {
-    res.send({ status: 'Bot activo', contactos: contactos.length, lista: contactos });
+    res.send({
+        status: 'Bot activo',
+        contactosGenerales: contactosGenerales.length,
+        contactosSpotify: contactosSpotify.length
+    });
 });
 
 // Iniciar servidor
