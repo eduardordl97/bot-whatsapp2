@@ -2,7 +2,7 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const cron = require('node-cron');
 const express = require('express');
-const path = require('path');
+const fs = require('fs');
 
 const app = express();
 let latestQR = null;
@@ -13,7 +13,13 @@ const PORT = process.env.PORT || 3000;
 // Carpeta persistente para la sesión (Render: /mnt/data es persistente)
 const sessionPath = '/mnt/data/wwebjs_session';
 
-// Página principal
+// Crear la carpeta si no existe
+if (!fs.existsSync(sessionPath)) {
+    fs.mkdirSync(sessionPath, { recursive: true });
+    console.log(`✅ Carpeta de sesión creada en ${sessionPath}`);
+}
+
+// Página principal: muestra QR mientras no haya sesión
 app.get('/', async (req, res) => {
     if (latestQR) {
         res.send(`
@@ -25,6 +31,7 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Endpoint para verificar estado de la sesión
 app.get('/status', async (req, res) => {
     const conectado = await client.isConnected();
     res.send({ conectado });
@@ -32,7 +39,7 @@ app.get('/status', async (req, res) => {
 
 app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
 
-// Inicializar cliente con carpeta de sesión persistente
+// Inicializar cliente con sesión persistente
 const client = new Client({
     authStrategy: new LocalAuth({ dataPath: sessionPath }),
     puppeteer: {
@@ -41,7 +48,7 @@ const client = new Client({
     }
 });
 
-// Generar QR
+// Evento QR
 client.on('qr', async qr => {
     try {
         latestQR = await QRCode.toDataURL(qr, {
@@ -81,13 +88,13 @@ function reconnect() {
     }, 10000);
 }
 
-// Mensaje programado ejemplo: 1:25 PM
-cron.schedule('55 13 * * *', () => {
+// Mensaje programado: 2:00 PM
+cron.schedule('0 14 * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, '📢 Mensaje programado a la 1:25 PM, Laloko eres un grande');
+        client.sendMessage(`${num}@c.us`, '📢 Lalón Bombón, este es un mensaje programado a las 2:00 PM');
     });
-    console.log('📤 Mensajes programados enviados a la 1:25 PM.');
+    console.log('📤 Mensajes programados enviados a las 2:00 PM.');
 });
 
 // Inicializar cliente
