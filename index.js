@@ -7,9 +7,13 @@ const app = express();
 let latestQR = null;
 
 // Página principal para mostrar QR
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     if (latestQR) {
-        res.send(`<h1>Escanea este código QR:</h1><img src="${latestQR}" />`);
+        // Genera HTML con la imagen en base64
+        res.send(`
+            <h1>Escanea este código QR Lalo:</h1>
+            <img src="${latestQR}" alt="QR WhatsApp" style="width:300px;height:300px"/>
+        `);
     } else {
         res.send('<h1>Bot activo o esperando QR...</h1>');
     }
@@ -19,24 +23,35 @@ app.listen(3000, () => console.log('🌐 Servidor web iniciado en puerto 3000'))
 
 // Inicializar cliente de WhatsApp con guardado de sesión
 const client = new Client({
-    authStrategy: new LocalAuth(), // guarda sesión para no pedir QR
+    authStrategy: new LocalAuth(), 
     puppeteer: {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
 });
 
+// Evento QR
 client.on('qr', async qr => {
-    latestQR = await QRCode.toDataURL(qr); // convierte QR en imagen base64
-    console.log('🔄 Nuevo QR generado. Escanéalo en la URL de Render.');
+    try {
+        // Genera base64 optimizado
+        latestQR = await QRCode.toDataURL(qr, {
+            errorCorrectionLevel: 'H', // mejor corrección de errores
+            type: 'image/png',
+            margin: 2,                 // margen más limpio
+            scale: 6                   // tamaño de imagen más grande
+        });
+        console.log('🔄 Nuevo QR generado. Escanéalo en la URL de Render.');
+    } catch (err) {
+        console.error('❌ Error generando QR:', err);
+    }
 });
 
+// Bot listo
 client.on('ready', () => {
     console.log('✅ Bot de WhatsApp listo y conectado.');
 
-    // Ejemplo: enviar mensaje todos los días a las 9:00 AM
-    cron.schedule('0 9 * * *', () => {
-        let contactos = ['5215562259536']; // números sin "+"
+    cron.schedule('25 13 * * *', () => {
+        let contactos = ['5215562259536']; 
         contactos.forEach(num => {
             client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenos días!');
         });
@@ -44,6 +59,7 @@ client.on('ready', () => {
     });
 });
 
+// Bot desconectado
 client.on('disconnected', (reason) => {
     console.log('⚠ Bot desconectado:', reason);
 });
