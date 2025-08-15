@@ -32,7 +32,7 @@ const contactosSpotify = [
 // ======== Función para enviar mensaje personalizado a todos los contactos generales ========
 function enviarMensajePersonalizado(textoBase) {
     contactosGenerales.forEach(contacto => {
-        const mensaje = `Hola ${contacto.nombre}, ${textoBase}`;
+        const mensaje = `Hola ${contacto.nombre}, ${textoBase}\n`;
         bot.sendMessage(contacto.id, mensaje);
     });
     console.log('📤 Mensajes personalizados enviados a todos los contactos generales');
@@ -75,8 +75,13 @@ cron.schedule('0 * * * *', () => {
     });
 
     enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶  
-                                    Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥  
+                                    Hey, son las ⏰ ${horaActual} y t sigues todo tibio 🔥  
                                     No te duermas, ¡es hora de chaquetiarse! ⚡😎`);
+
+    enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶\n\n` +
+                `Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥\n` +
+                `¡No te duermas, es hora de chaquetiarse! ⚡😎`);
+
     console.log(`⏰ Mensaje enviado a todos los contactos generales a las ${horaActual}`);
 });
 
