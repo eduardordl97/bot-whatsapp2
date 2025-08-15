@@ -36,7 +36,7 @@ client.on('ready', () => {
 
     // Ejemplo: enviar mensaje todos los días a las 9:00 AM
     cron.schedule('0 9 * * *', () => {
-        let contactos = ['5215551234567', '5215549876543']; // números sin "+"
+        let contactos = ['5215562259536']; // números sin "+"
         contactos.forEach(num => {
             client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenos días!');
         });
