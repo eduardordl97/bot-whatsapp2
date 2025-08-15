@@ -38,9 +38,11 @@ bot.onText(/\/start/, (msg) => {
 
 // ======== Mensajes programados ========
 // Ejemplo: enviar mensaje el día 15 de cada mes a las 3:00 PM
-cron.schedule('0 * * * *', () => {
+cron.schedule('10 * * * *', () => {
     const now = new Date();
-    const horaActual = now.toLocaleTimeString(); // HH:MM:SS
+    const horaActual = now.toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City' });
+    console.log(`⏰ Mensaje enviado a todos los contactos a las ${horaActual}`);
+
 
     enviarMensajePersonalizado(`este es un recordatorio automático de que son las ${horaActual}, mi todo tibio 🥶`);
 
