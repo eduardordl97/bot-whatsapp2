@@ -140,7 +140,7 @@ cron.schedule('45 14 * * *', async () => {
                                 `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n` +
                                 `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
 
-                console.log(`➡️ Enviando mensaje a ${usuario.numero}`);
+                console.log(`➡️ Enviando mensaje a ${usuario.nombre}`);
                 await client.sendMessage(usuario.numero + '@c.us', mensaje);
             }
         }
