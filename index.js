@@ -216,7 +216,7 @@ const listaKaelus = [
 ];
 
 // Cron job todos los días a las 12:05 p.m. CDMX → 18:05 UTC en Render
-cron.schedule('20 18 * * *', async () => { 
+cron.schedule('25 18 * * *', async () => { 
   try {
     const now = new Date();
     const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
