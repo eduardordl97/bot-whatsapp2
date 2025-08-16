@@ -1,12 +1,11 @@
 {
   "name": "bot-whatsapp",
   "version": "1.0.0",
-  "main": "telegram.js",
-"scripts": {
-  "start": "node telegram.js"
-},
-
-  
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
