@@ -79,44 +79,8 @@ client.on('qr', async qr => {
 // Bot listo
 client.on('ready', () => {
     console.log('✅ Bot de WhatsApp listo y conectado.');
-    latestQR = null; // QR ya no se necesita
+    latestQR = null;
     conectado = true;
-
-    // ---------------------------
-    // Cron Kaelus TV (ajustado a CDMX)
-    // ---------------------------
-    const listaKaelus = [
-        { nombre: "Eduardo", numero: "5215562259536", vencimiento: 18 },
-        { nombre: "Benito Fornica", numero: "5215544726563", vencimiento: 16 }
-    ];
-
-    // Se ejecuta a las 13:45 CDMX (19:45 UTC)
-    cron.schedule('05 10 * * *', async () => {
-        console.log("⏰ Ejecutando cron Kaelus TV");
-        try {
-            const now = new Date();
-            const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
-
-            console.log("⏰ Ejecutando cron Kaelus TV. Día de hoy:", diaHoy);
-
-            for (const usuario of listaKaelus) {
-                if (diaHoy === usuario.vencimiento) {
-                    const fechaFormateada = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long' });
-                    const mensaje = `🍿 Hola ${usuario.nombre}! 🙌\n\n` +
-                                    `Hoy es *${fechaFormateada}* y vence tu suscripción *Kaelus TV* 📺✨\n` +
-                                    `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n` +
-                                    `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
-
-                    console.log(`➡️ Enviando mensaje a ${usuario.numero}`);
-                    await client.sendMessage(usuario.numero + '@c.us', mensaje);
-                }
-            }
-
-            console.log("✅ Proceso de Kaelus TV completado.");
-        } catch (err) {
-            console.error("❌ Error en cron Kaelus TV:", err);
-        }
-    }, { timezone: "America/Mexico_City" }); // <-- Ajuste clave para CDMX
 });
 
 // Reconexión automática
@@ -132,7 +96,6 @@ client.on('auth_failure', msg => {
     reconnect();
 });
 
-// Manejar errores de Puppeteer como ProtocolError
 process.on('unhandledRejection', (reason, promise) => {
     if (reason?.message?.includes('Execution context was destroyed')) {
         console.log('⚠ ProtocolError detectado, reiniciando cliente...');
@@ -155,10 +118,41 @@ function reconnect() {
 // ✅ MENSAJES PROGRAMADOS
 // ---------------------------------------------------------------------
 
-// 1. Mensaje diario de tibieza → todos los días a las 16:10 hrs
-// cron.schedule('10 17 * * *', () => { ... });
+// ---------------------------
+// 1️⃣ Cron Kaelus TV (vencimiento individual)
+// Todos los días a las 13:45 CDMX
+const listaKaelus = [
+    { nombre: "Eduardo", numero: "5215562259536", vencimiento: 18 },
+    { nombre: "Benito Fornica", numero: "5215544726563", vencimiento: 16 }
+];
 
-// 2. Turnos de Spotify → cada 26 de mes a las 17:00 hrs
+cron.schedule('12 14 * * *', async () => {
+    try {
+        const now = new Date();
+        const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
+        console.log("⏰ Ejecutando cron Kaelus TV. Día de hoy:", diaHoy);
+
+        for (const usuario of listaKaelus) {
+            if (diaHoy === usuario.vencimiento) {
+                const fechaFormateada = now.toLocaleDateString('es-MX', { day: 'numeric', month: 'long' });
+                const mensaje = `🍿 Hola ${usuario.nombre}! 🙌\n\n` +
+                                `Hoy es *${fechaFormateada}* y vence tu suscripción *Kaelus TV* 📺✨\n` +
+                                `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n` +
+                                `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
+
+                console.log(`➡️ Enviando mensaje a ${usuario.numero}`);
+                await client.sendMessage(usuario.numero + '@c.us', mensaje);
+            }
+        }
+
+        console.log("✅ Proceso de Kaelus TV completado.");
+    } catch (err) {
+        console.error("❌ Error en cron Kaelus TV:", err);
+    }
+}, { timezone: "America/Mexico_City" });
+
+// ---------------------------
+// 2️⃣ Turnos Spotify
 const spotifyTurnos = ["Memo", "Eduardo", "Miguel", "Jacobo", "Mando", "Mike"];
 const numerosSpotify = {
     "Memo": "5215569661253",
@@ -178,7 +172,8 @@ function obtenerTurnoSpotify() {
     return spotifyTurnos[indiceTurno];
 }
 
-cron.schedule('0 18 26 * *', () => {
+// Cron a las 12:00 CDMX el día 26 de cada mes
+cron.schedule('0 12 26 * *', () => {
     const persona = obtenerTurnoSpotify();
     const numero = numerosSpotify[persona];
 
@@ -193,18 +188,20 @@ cron.schedule('0 18 26 * *', () => {
     } else {
         console.log("⚠ No se encontró número para", persona);
     }
-});
+}, { timezone: "America/Mexico_City" });
 
-// Recordatorio mensual YouTube Premium
-cron.schedule('0 18 4 * *', () => {  
-    const listaYoutube = [
-        { nombre: "Eduardo", numero: "5215562259536" },
-        { nombre: "Mando", numero: "5215610776151" },
-        { nombre: "Serch", numero: "5215612083803" }
-    ];
+// ---------------------------
+// 3️⃣ YouTube Premium
+const listaYoutube = [
+    { nombre: "Eduardo", numero: "5215562259536" },
+    { nombre: "Mando", numero: "5215610776151" },
+    { nombre: "Serch", numero: "5215612083803" }
+];
 
+// Cron a las 12:00 CDMX el día 4 de cada mes
+cron.schedule('0 12 4 * *', () => {
     const now = new Date();
-    const fecha = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
+    const fecha = now.toLocaleDateString('es-MX');
 
     listaYoutube.forEach(contacto => {
         const mensaje = `📺🟥 ¡Hey ${contacto.nombre}! 😎\n\n` +
@@ -216,6 +213,11 @@ cron.schedule('0 18 4 * *', () => {
         console.log(`📩 Recordatorio de YouTube Premium enviado a ${contacto.nombre}`);
     });
 }, { timezone: "America/Mexico_City" });
+
+// ---------------------------
+// 4️⃣ Mensaje diario de tibieza (opcional)
+// Cron a las 16:10 CDMX todos los días
+// cron.schedule('10 16 * * *', () => { ... }, { timezone: "America/Mexico_City" });
 
 // Inicializar cliente
 client.initialize();
