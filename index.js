@@ -115,14 +115,76 @@ function reconnect() {
     }, 10000);
 }
 
-// Mensaje programado cada día a las 10:00 AM
-cron.schedule('0 10 * * *', () => {
-    let contactos = ['5215562259536']; 
-    contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, 'Buenos días amor, que tengas un excelente día, te amo con todo mi corazón ❤️');
+// ---------------------------------------------------------------------
+// ✅ MENSAJES PROGRAMADOS
+// ---------------------------------------------------------------------
+
+// 1. Mensaje diario de tibieza → todos los días a las 16:10 hrs
+cron.schedule('10 16 * * *', () => {
+    let contactos = ['5215562259536', '5215612083803','5215569661253','5215512928235','5215561723812']; 
+    const now = new Date();
+    const horaActual = now.toLocaleTimeString('es-MX', {
+        timeZone: 'America/Mexico_City',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
     });
-    console.log('📤 Mensajes programados enviados.');
+    contactos.forEach(num => {
+        client.sendMessage(`${num}@c.us`, `🚨 ¡Alerta de tibieza! 🥶\n\n` +
+                `Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥\n` +
+                `¡No te duermas, es hora de apoyar al Cruz Azul! ⚡😎`);
+    });
+    console.log('📤 Mensajes programados enviados (tibieza).');
 });
+
+// ---------------------------------------------------------------------
+// 2. Turnos de Spotify → cada 26 de mes a las 17:00 hrs
+// ---------------------------------------------------------------------
+
+// Lista de personas y su orden
+const spotifyTurnos = ["Memo", "Eduardo", "Miguel", "Jacobo", "Mando", "Mike"];
+
+// Números asociados a cada persona
+const numerosSpotify = {
+    "Memo": "5215569661253",
+    "Eduardo": "5215562259537",
+    "Miguel": "5215512928235",
+    "Jacobo": "5215561723812",
+    "Mando": "5215610776151",
+    "Mike": "5215512928235"
+};
+
+// Fecha base: 26 de julio 2025 → Memo
+const fechaBase = new Date("2025-07-16");
+
+// Función para obtener quién paga este mes
+function obtenerTurnoSpotify() {
+    const hoy = new Date();
+    const diffMeses = (hoy.getFullYear() - fechaBase.getFullYear()) * 12 +
+                      (hoy.getMonth() - fechaBase.getMonth());
+    const indiceTurno = diffMeses % spotifyTurnos.length;
+    return spotifyTurnos[indiceTurno];
+}
+
+// Cron job
+cron.schedule('0 17 16 * *', () => {
+    const persona = obtenerTurnoSpotify();
+    const numero = numerosSpotify[persona];
+
+    if (numero) {
+        client.sendMessage(`${numero}@c.us`,
+            `🎵 ¡Hey ${persona}! 😎\n\n` +
+            `Este mes te toca ser el **héroe de Spotify** 🤑\n` +
+            `No olvides pagar antes del 28 para que todos sigamos escuchando 🎶\n` +
+            `¡Tú puedes! 💪✨`
+        );
+        console.log(`📤 Mensaje de Spotify enviado a ${persona}`);
+    } else {
+        console.log("⚠ No se encontró número para", persona);
+    }
+});
+
+// ---------------------------------------------------------------------
 
 // Inicializar cliente
 client.initialize();
