@@ -119,7 +119,7 @@ function reconnect() {
 cron.schedule('0 * * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, '📢 Aviso automático:\n ¡Buenas tardes Laloko, Arriba el azul.!');
+        client.sendMessage(`${num}@c.us`, 'Buenos días amor, que tengas un excelente día, te amo con todo mi corazón ❤️');
     });
     console.log('📤 Mensajes programados enviados.');
 });
