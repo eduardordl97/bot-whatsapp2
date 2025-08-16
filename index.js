@@ -25,6 +25,9 @@ const PREFIJO = "521";
 // Estado de conexión
 let conectado = false;
 
+// Arreglo para llevar los cron jobs dinámicos
+let scheduledJobs = [];
+
 // Página principal: muestra QR mientras no haya sesión
 app.get('/', async (req, res) => {
     if (latestQR) {
@@ -43,38 +46,37 @@ app.get('/status', (req, res) => {
 });
 
 // Endpoint POST para actualizar lista Kaelus TV en caliente
-let listaKaelus = [];
+let listaKaelus = []; // Inicialmente vacía
 app.post('/update-kaelus', (req, res) => {
     listaKaelus = req.body;
     console.log("✅ Lista Kaelus actualizada:", listaKaelus);
     res.send({ ok: true, length: listaKaelus.length });
 });
 
-// Endpoint POST para programar mensajes personalizados
+// Endpoint POST para registrar múltiples mensajes programados
 app.post('/schedule-message', (req, res) => {
-    const { contactos, titulo, mensaje, schedule } = req.body;
+    const mensajes = req.body;
 
-    if (!contactos || !mensaje || !schedule) {
-        return res.status(400).send({ ok: false, error: "Faltan campos obligatorios" });
+    if (!Array.isArray(mensajes)) {
+        return res.status(400).send({ ok: false, error: "Debe ser un arreglo de mensajes" });
     }
 
-    const cronExp = `${schedule.minuto || '*'} ${schedule.hora || '*'} ${schedule.dia || '*'} ${schedule.mes || '*'} ${schedule.diaSemana || '*'}`;
+    mensajes.forEach(msg => {
+        const { titulo, mensaje, contactos, minuto, hora, dia, mes, diaSemana, timezone } = msg;
 
-    cron.schedule(cronExp, async () => {
-        const now = new Date();
-        if (schedule.year && now.getFullYear() !== schedule.year) return;
+        const cronExpr = `${minuto} ${hora} ${dia} ${mes} ${diaSemana}`;
+        const job = cron.schedule(cronExpr, () => {
+            contactos.forEach(numero => {
+                client.sendMessage(PREFIJO + numero + '@c.us', mensaje);
+                console.log(`📤 [${titulo}] Mensaje enviado a ${numero}`);
+            });
+        }, { timezone });
 
-        for (const contacto of contactos) {
-            const numero = `${contacto.prefijo || PREFIJO}${contacto.numero}`;
-            const msgFinal = `${titulo ? `*${titulo}*\n` : ''}${mensaje}`;
-            console.log(`➡️ Enviando mensaje a ${numero}`);
-            await client.sendMessage(`${numero}@c.us`, msgFinal);
-        }
-        console.log("✅ Mensaje programado enviado:", titulo || '(sin título)');
-    }, { timezone: schedule.timezone || "America/Mexico_City" });
+        scheduledJobs.push(job);
+        console.log(`✅ [${titulo}] Cron job registrado: ${cronExpr} (${timezone})`);
+    });
 
-    console.log(`✅ Cron programado: ${cronExp}`);
-    res.send({ ok: true, cron: cronExp });
+    res.send({ ok: true, total: mensajes.length });
 });
 
 app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
@@ -153,13 +155,13 @@ function reconnect() {
 }
 
 // ---------------------------------------------------------------------
+// ---------------------------
 // 1️⃣ Cron Kaelus TV (vencimiento individual)
 // Todos los días a las 14:55 CDMX
 cron.schedule('55 14 * * *', async () => {
     try {
         const now = new Date();
         const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
-        console.log("⏰ Ejecutando cron Kaelus TV. Día de hoy:", diaHoy);
 
         for (const usuario of listaKaelus) {
             if (diaHoy === usuario.vencimiento) {
@@ -169,12 +171,10 @@ cron.schedule('55 14 * * *', async () => {
                                 `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n` +
                                 `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
 
-                console.log(`➡️ Enviando mensaje a ${usuario.nombre}`);
                 await client.sendMessage(PREFIJO + usuario.numero + '@c.us', mensaje);
+                console.log(`➡️ [Kaelus TV] Mensaje enviado a ${usuario.nombre}`);
             }
         }
-
-        console.log("✅ Proceso de Kaelus TV completado.");
     } catch (err) {
         console.error("❌ Error en cron Kaelus TV:", err);
     }
@@ -201,7 +201,6 @@ function obtenerTurnoSpotify() {
     return spotifyTurnos[indiceTurno];
 }
 
-// Cron a las 12:00 CDMX el día 26 de cada mes
 cron.schedule('0 12 26 * *', () => {
     const persona = obtenerTurnoSpotify();
     const numero = numerosSpotify[persona];
@@ -213,9 +212,7 @@ cron.schedule('0 12 26 * *', () => {
             `No olvides pagar antes del día 28 para que todos sigamos escuchando 🟢🎧\n` +
             `¡Tú puedes! 💪✨`
         );
-        console.log(`📤 Mensaje de Spotify enviado a ${persona}`);
-    } else {
-        console.log("⚠ No se encontró número para", persona);
+        console.log(`📤 [Spotify] Mensaje enviado a ${persona}`);
     }
 }, { timezone: "America/Mexico_City" });
 
@@ -227,7 +224,6 @@ const listaYoutube = [
     { nombre: "Serch", numero: "5612083803" }
 ];
 
-// Cron a las 12:00 CDMX el día 4 de cada mes
 cron.schedule('0 12 4 * *', () => {
     const now = new Date();
     const fecha = now.toLocaleDateString('es-MX');
@@ -239,7 +235,7 @@ cron.schedule('0 12 4 * *', () => {
                         `¡Gracias crack! 🙌`;
 
         client.sendMessage(PREFIJO + contacto.numero + '@c.us', mensaje);
-        console.log(`📩 Recordatorio de YouTube Premium enviado a ${contacto.nombre}`);
+        console.log(`📩 [YouTube] Recordatorio enviado a ${contacto.nombre}`);
     });
 }, { timezone: "America/Mexico_City" });
 
