@@ -5,6 +5,8 @@ const express = require('express');
 const fs = require('fs');
 
 const app = express();
+app.use(express.json()); // Para recibir JSON en POST
+
 let latestQR = null;
 
 // Puerto asignado por Render
@@ -12,8 +14,6 @@ const PORT = process.env.PORT || 3000;
 
 // Carpeta temporal para la sesión (Render Free)
 const sessionPath = '/tmp/wwebjs_session';
-
-// Crear carpeta temporal si no existe
 if (!fs.existsSync(sessionPath)) {
     fs.mkdirSync(sessionPath, { recursive: true });
     console.log(`✅ Carpeta de sesión creada en ${sessionPath}`);
@@ -37,6 +37,14 @@ app.get('/', async (req, res) => {
 // Endpoint para verificar estado de la sesión
 app.get('/status', (req, res) => {
     res.send({ conectado });
+});
+
+// Endpoint POST para actualizar lista Kaelus TV en caliente
+let listaKaelus = []; // Inicialmente vacía
+app.post('/update-kaelus', (req, res) => {
+    listaKaelus = req.body;
+    console.log("✅ Lista Kaelus actualizada:", listaKaelus);
+    res.send({ ok: true, length: listaKaelus.length });
 });
 
 app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
@@ -115,18 +123,10 @@ function reconnect() {
 }
 
 // ---------------------------------------------------------------------
-// ✅ MENSAJES PROGRAMADOS
-// ---------------------------------------------------------------------
-
 // ---------------------------
 // 1️⃣ Cron Kaelus TV (vencimiento individual)
-// Todos los días a las 13:45 CDMX
-const listaKaelus = [
-    { nombre: "Eduardo", numero: "5215562259536", vencimiento: 18 },
-    { nombre: "Benito Fornica", numero: "5215544726563", vencimiento: 16 }
-];
-
-cron.schedule('12 14 * * *', async () => {
+// Todos los días a las 14:45 CDMX
+cron.schedule('45 14 * * *', async () => {
     try {
         const now = new Date();
         const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
@@ -216,7 +216,6 @@ cron.schedule('0 12 4 * *', () => {
 
 // ---------------------------
 // 4️⃣ Mensaje diario de tibieza (opcional)
-// Cron a las 16:10 CDMX todos los días
 // cron.schedule('10 16 * * *', () => { ... }, { timezone: "America/Mexico_City" });
 
 // Inicializar cliente
