@@ -167,15 +167,15 @@ function obtenerTurnoSpotify() {
 }
 
 // Cron job
-cron.schedule('0 18 16 * *', () => {
+cron.schedule('0 18 26 * *', () => {
     const persona = obtenerTurnoSpotify();
     const numero = numerosSpotify[persona];
 
     if (numero) {
         client.sendMessage(`${numero}@c.us`,
             `🎵 ¡Hey ${persona}! 😎\n\n` +
-            `Este mes te toca ser el **héroe de Spotify** 🤑\n` +
-            `No olvides pagar antes del 28 para que todos sigamos escuchando 🎶\n` +
+            `Este mes te toca ser el *héroe de Spotify* 💳🤑\n` +
+            `No olvides pagar antes del día 28 para que todos sigamos escuchando 🟢🎧\n` +
             `¡Tú puedes! 💪✨`
         );
         console.log(`📤 Mensaje de Spotify enviado a ${persona}`);
@@ -196,8 +196,8 @@ cron.schedule('0 18 4 * *', () => {
     const fecha = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
 
     listaYoutube.forEach(contacto => {
-        const mensaje = `📺 ¡Hey ${contacto.nombre}! 😎\n\n` +
-                        `Hoy es *${fecha}* y toca el pago de **YouTube Premium** 💳🎶\n\n` +
+        const mensaje = `📺🟥 ¡Hey ${contacto.nombre}! 😎\n\n` +
+                        `Hoy es *${fecha}* y toca el pago de *YouTube Premium* 💳🎶\n\n` +
                         `Porfa no lo olvides para que todos sigamos disfrutando sin anuncios 🚀🔥\n\n` +
                         `¡Gracias crack! 🙌`;
 
@@ -208,6 +208,34 @@ cron.schedule('0 18 4 * *', () => {
     timezone: "America/Mexico_City"
 });
 // ---------------------------------------------------------------------
+// Recordatorios de Kaelus TV según vencimiento individual
+const listaKaelus = [
+    { nombre: "Eduardo", numero: "5215562259536", vencimiento: 18 },
+    { nombre: "Benito Fornica", numero: "5215544726563", vencimiento: 16 }
+];
+
+listaKaelus.forEach(contacto => {
+    // Crear un cron específico para el día de vencimiento de cada contacto
+    const cronExp = `30 18 ${contacto.vencimiento} * *`; 
+    // → a las 12:00am el día de vencimiento, cada mes
+
+    cron.schedule(cronExp, () => {
+        const now = new Date();
+        
+
+        const mensaje = `🍿 Hola ${contacto.nombre}! 🙌\n\n` +
+                        `Hoy es *${now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long' })}* y vence tu suscripción *Kaelus TV* 📺✨\n\n` +
+                        `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n\n` +
+                        `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
+
+        client.sendMessage(`${contacto.numero}@c.us`, mensaje);
+        console.log(`📩 Recordatorio de Kaelus TV enviado a ${contacto.nombre}`);
+    }, {
+        timezone: "America/Mexico_City"
+    });
+
+    console.log(`✅ Programado recordatorio para ${contacto.nombre} el día ${contacto.vencimiento} de cada mes`);
+});
 
 
 // Inicializar cliente
