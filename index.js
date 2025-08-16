@@ -127,8 +127,8 @@ function reconnect() {
 
 // ---------------------------------------------------------------------
 // 1️⃣ Cron Kaelus TV (vencimiento individual)
-// Todos los días a las 14:45 CDMX
-cron.schedule('45 14 * * *', async () => {
+// Todos los días a las 14:55 CDMX
+cron.schedule('55 14 * * *', async () => {
     try {
         const now = new Date();
         const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
