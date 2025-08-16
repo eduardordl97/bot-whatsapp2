@@ -185,7 +185,7 @@ cron.schedule('0 18 16 * *', () => {
 });
 
 // Recordatorio mensual YouTube Premium
-cron.schedule('0 10 4 * *', () => {  
+cron.schedule('0 18 4 * *', () => {  
     const listaYoutube = [
         { nombre: "Eduardo", numero: "5215562259536" },
         { nombre: "Mando", numero: "5215610776151" },
