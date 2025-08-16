@@ -120,22 +120,22 @@ function reconnect() {
 // ---------------------------------------------------------------------
 
 // 1. Mensaje diario de tibieza → todos los días a las 16:10 hrs
-cron.schedule('10 17 * * *', () => {
-    let contactos = ['5215562259536', '5215612083803','5215569661253','5215512928235','5215561723812']; 
-    const now = new Date();
-    const horaActual = now.toLocaleTimeString('es-MX', {
-        timeZone: 'America/Mexico_City',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-    contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, `🚨 ¡Alerta de tibieza! 🥶\n\n` +
-                `Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥\n` +
-                `¡No te duermas, es hora de apoyar al Cruz Azul! ⚡😎`);
-    });
-    console.log('📤 Mensajes programados enviados (tibieza).');
-});
+// cron.schedule('10 17 * * *', () => {
+//     let contactos = ['5215562259536', '5215612083803','5215569661253','5215512928235','5215561723812']; 
+//     const now = new Date();
+//     const horaActual = now.toLocaleTimeString('es-MX', {
+//         timeZone: 'America/Mexico_City',
+//         hour: '2-digit',
+//         minute: '2-digit',
+//         hour12: true
+//     });
+//     contactos.forEach(num => {
+//         client.sendMessage(`${num}@c.us`, `🚨 ¡Alerta de tibieza! 🥶\n\n` +
+//                 `Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥\n` +
+//                 `¡No te duermas, es hora de apoyar al Cruz Azul! ⚡😎`);
+//     });
+//     console.log('📤 Mensajes programados enviados (tibieza).');
+// });
 
 // ---------------------------------------------------------------------
 // 2. Turnos de Spotify → cada 26 de mes a las 17:00 hrs
@@ -147,7 +147,7 @@ const spotifyTurnos = ["Memo", "Eduardo", "Miguel", "Jacobo", "Mando", "Mike"];
 // Números asociados a cada persona
 const numerosSpotify = {
     "Memo": "5215569661253",
-    "Eduardo": "5215562259537",
+    "Eduardo": "5215562259536",
     "Miguel": "5215512928235",
     "Jacobo": "5215561723812",
     "Mando": "5215610776151",
@@ -184,7 +184,31 @@ cron.schedule('0 18 16 * *', () => {
     }
 });
 
+// Recordatorio mensual YouTube Premium
+cron.schedule('0 10 4 * *', () => {  
+    const listaYoutube = [
+        { nombre: "Eduardo", numero: "5215562259536" },
+        { nombre: "Mando", numero: "5215610776151" },
+        { nombre: "Serch", numero: "5215612083803" }
+    ];
+
+    const now = new Date();
+    const fecha = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
+
+    listaYoutube.forEach(contacto => {
+        const mensaje = `📺 ¡Hey ${contacto.nombre}! 😎\n\n` +
+                        `Hoy es *${fecha}* y toca el pago de **YouTube Premium** 💳🎶\n\n` +
+                        `Porfa no lo olvides para que todos sigamos disfrutando sin anuncios 🚀🔥\n\n` +
+                        `¡Gracias crack! 🙌`;
+
+        client.sendMessage(`${contacto.numero}@c.us`, mensaje);
+        console.log(`📩 Recordatorio de YouTube Premium enviado a ${contacto.nombre}`);
+    });
+}, {
+    timezone: "America/Mexico_City"
+});
 // ---------------------------------------------------------------------
+
 
 // Inicializar cliente
 client.initialize();
