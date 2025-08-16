@@ -115,8 +115,8 @@ function reconnect() {
     }, 10000);
 }
 
-// Mensaje programado cada hora en punto
-cron.schedule('0 * * * *', () => {
+// Mensaje programado cada día a las 10:00 AM
+cron.schedule('0 10 * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
         client.sendMessage(`${num}@c.us`, 'Buenos días amor, que tengas un excelente día, te amo con todo mi corazón ❤️');
