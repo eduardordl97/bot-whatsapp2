@@ -19,6 +19,9 @@ if (!fs.existsSync(sessionPath)) {
     console.log(`✅ Carpeta de sesión creada en ${sessionPath}`);
 }
 
+// Estado de conexión
+let conectado = false;
+
 // Página principal: muestra QR mientras no haya sesión
 app.get('/', async (req, res) => {
     if (latestQR) {
@@ -32,8 +35,7 @@ app.get('/', async (req, res) => {
 });
 
 // Endpoint para verificar estado de la sesión
-app.get('/status', async (req, res) => {
-    const conectado = await client.isConnected();
+app.get('/status', (req, res) => {
     res.send({ conectado });
 });
 
@@ -78,16 +80,19 @@ client.on('qr', async qr => {
 client.on('ready', () => {
     console.log('✅ Bot de WhatsApp listo y conectado.');
     latestQR = null; // QR ya no se necesita
+    conectado = true;
 });
 
 // Reconexión automática
 client.on('disconnected', reason => {
     console.log('⚠ Desconectado:', reason);
+    conectado = false;
     reconnect();
 });
 
 client.on('auth_failure', msg => {
     console.log('❌ Falló la autenticación:', msg);
+    conectado = false;
     reconnect();
 });
 
@@ -103,19 +108,20 @@ process.on('unhandledRejection', (reason, promise) => {
 
 function reconnect() {
     console.log('🔄 Intentando reconectar en 10 segundos...');
+    conectado = false;
     setTimeout(() => {
         client.destroy();
         client.initialize();
     }, 10000);
 }
 
-// Mensaje programado: 2:45 PM
+// Mensaje programado cada hora en punto
 cron.schedule('0 * * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
         client.sendMessage(`${num}@c.us`, '📢 Aviso automático:\n ¡Buenas tardes Laloko, Arriba el azul.!');
     });
-    console.log('📤 Mensajes programados enviados a la 2:45 PM.');
+    console.log('📤 Mensajes programados enviados.');
 });
 
 // Inicializar cliente
