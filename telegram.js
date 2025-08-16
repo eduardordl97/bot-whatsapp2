@@ -11,11 +11,11 @@ const bot = new TelegramBot(token, { polling: true });
 
 // ======== Contactos generales (mensajes horarios) ========
 const contactosGenerales = [
-    { "nombre": "Eduardo", "id": 1034833893 },
-    { "nombre": "Memo", "id": 1591483148 },
-    { "nombre": "Miguel", "id": 6520635694 },
-    { "nombre": "Jacob", "id": 5437780923 },
-    { "nombre": "Serch", "id": 2097823501 }
+    { "nombre": "Eduardo", "id": 1034833893 }
+    // { "nombre": "Memo", "id": 1591483148 },
+    // { "nombre": "Miguel", "id": 6520635694 },
+    // { "nombre": "Jacob", "id": 5437780923 },
+    // { "nombre": "Serch", "id": 2097823501 }
     
 ];
 
@@ -74,11 +74,7 @@ cron.schedule('0 * * * *', () => {
         hour12: true // formato 12 horas con AM/PM
     });
 
-    enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶  
-                                    Hey, son las ⏰ ${horaActual} y t sigues todo tibio 🔥  
-                                    No te duermas, ¡es hora de chaquetiarse! ⚡😎`);
-
-    enviarMensajePersonalizado(`🚨 ¡Alerta de tibieza! 🥶\n\n` +
+    enviarMensajePersonalizado(`\n🚨 ¡Alerta de tibieza! 🥶\n\n` +
                 `Hey, son las ⏰ ${horaActual} y tú sigues todo tibio 🔥\n` +
                 `¡No te duermas, es hora de chaquetiarse! ⚡😎`);
 
