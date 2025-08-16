@@ -19,6 +19,9 @@ if (!fs.existsSync(sessionPath)) {
     console.log(`✅ Carpeta de sesión creada en ${sessionPath}`);
 }
 
+// Prefijo global para todos los números
+const PREFIJO = "521";
+
 // Estado de conexión
 let conectado = false;
 
@@ -123,7 +126,6 @@ function reconnect() {
 }
 
 // ---------------------------------------------------------------------
-// ---------------------------
 // 1️⃣ Cron Kaelus TV (vencimiento individual)
 // Todos los días a las 14:45 CDMX
 cron.schedule('45 14 * * *', async () => {
@@ -141,7 +143,7 @@ cron.schedule('45 14 * * *', async () => {
                                 `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
 
                 console.log(`➡️ Enviando mensaje a ${usuario.nombre}`);
-                await client.sendMessage(usuario.numero + '@c.us', mensaje);
+                await client.sendMessage(PREFIJO + usuario.numero + '@c.us', mensaje);
             }
         }
 
@@ -155,12 +157,12 @@ cron.schedule('45 14 * * *', async () => {
 // 2️⃣ Turnos Spotify
 const spotifyTurnos = ["Memo", "Eduardo", "Miguel", "Jacobo", "Mando", "Mike"];
 const numerosSpotify = {
-    "Memo": "5215569661253",
-    "Eduardo": "5215562259536",
-    "Miguel": "5215512928235",
-    "Jacobo": "5215561723812",
-    "Mando": "5215610776151",
-    "Mike": "5215512928235"
+    "Memo": "5569661253",
+    "Eduardo": "5562259536",
+    "Miguel": "5512928235",
+    "Jacobo": "5561723812",
+    "Mando": "5610776151",
+    "Mike": "5512928235"
 };
 const fechaBase = new Date("2025-07-16");
 
@@ -178,7 +180,7 @@ cron.schedule('0 12 26 * *', () => {
     const numero = numerosSpotify[persona];
 
     if (numero) {
-        client.sendMessage(`${numero}@c.us`,
+        client.sendMessage(PREFIJO + numero + '@c.us',
             `🎵 ¡Hey ${persona}! 😎\n\n` +
             `Este mes te toca ser el *héroe de Spotify* 💳🤑\n` +
             `No olvides pagar antes del día 28 para que todos sigamos escuchando 🟢🎧\n` +
@@ -193,9 +195,9 @@ cron.schedule('0 12 26 * *', () => {
 // ---------------------------
 // 3️⃣ YouTube Premium
 const listaYoutube = [
-    { nombre: "Eduardo", numero: "5215562259536" },
-    { nombre: "Mando", numero: "5215610776151" },
-    { nombre: "Serch", numero: "5215612083803" }
+    { nombre: "Eduardo", numero: "5562259536" },
+    { nombre: "Mando", numero: "5610776151" },
+    { nombre: "Serch", numero: "5612083803" }
 ];
 
 // Cron a las 12:00 CDMX el día 4 de cada mes
@@ -209,14 +211,10 @@ cron.schedule('0 12 4 * *', () => {
                         `Porfa no lo olvides para que todos sigamos disfrutando sin anuncios 🚀🔥\n\n` +
                         `¡Gracias crack! 🙌`;
 
-        client.sendMessage(`${contacto.numero}@c.us`, mensaje);
+        client.sendMessage(PREFIJO + contacto.numero + '@c.us', mensaje);
         console.log(`📩 Recordatorio de YouTube Premium enviado a ${contacto.nombre}`);
     });
 }, { timezone: "America/Mexico_City" });
-
-// ---------------------------
-// 4️⃣ Mensaje diario de tibieza (opcional)
-// cron.schedule('10 16 * * *', () => { ... }, { timezone: "America/Mexico_City" });
 
 // Inicializar cliente
 client.initialize();
