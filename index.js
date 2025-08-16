@@ -110,10 +110,10 @@ function reconnect() {
 }
 
 // Mensaje programado: 2:45 PM
-cron.schedule('45 14 * * *', () => {
+cron.schedule('0 * * * *', () => {
     let contactos = ['5215562259536']; 
     contactos.forEach(num => {
-        client.sendMessage(`${num}@c.us`, '📢 Aviso automático: ¡Buenas tardes Laloko, son las 2:45 p.m.!');
+        client.sendMessage(`${num}@c.us`, '📢 Aviso automático:\n ¡Buenas tardes Laloko, Arriba el azul.!');
     });
     console.log('📤 Mensajes programados enviados a la 2:45 PM.');
 });
