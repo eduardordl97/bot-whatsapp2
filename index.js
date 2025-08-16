@@ -209,36 +209,32 @@ cron.schedule('0 18 4 * *', () => {
 });
 // ---------------------------------------------------------------------
 // Recordatorios de Kaelus TV según vencimiento individual
+// Lista de usuarios Kaelus TV
 const listaKaelus = [
     { nombre: "Eduardo", numero: "5215562259536", vencimiento: 18 },
     { nombre: "Benito Fornica", numero: "5215544726563", vencimiento: 16 }
 ];
 
-cron.schedule('05 19 * * *', async () => { // todos los días a las 1:05 p.m. CDMX
+// Cron job todos los días a las 12:05 p.m. CDMX → 18:05 UTC en Render
+cron.schedule('20 18 * * *', async () => { 
   try {
     const now = new Date();
-    const hoy = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
+    const diaHoy = parseInt(now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit' }));
 
-    console.log("⏰ Ejecutando cron Kaelus:", hoy);
+    console.log("⏰ Ejecutando cron Kaelus:", diaHoy);
 
     for (const usuario of listaKaelus) {
-      const vencimiento = new Date(usuario.vencimiento);
-      const fechaFormateada = vencimiento.toLocaleDateString('es-MX', {
-        timeZone: 'America/Mexico_City',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
+      if (diaHoy === usuario.vencimiento) {
+        const fechaFormateada = now.toLocaleDateString('es-MX', { 
+            timeZone: 'America/Mexico_City', 
+            day: 'numeric', 
+            month: 'long' 
+        });
 
-      // Checar si hoy es la fecha de vencimiento del usuario
-      const fechaHoy = now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
-      const fechaVenc = vencimiento.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
-
-      if (fechaHoy === fechaVenc) {
-        const mensaje = `🍿 Hola ${contacto.nombre}! 🙌\n\n` +
-                    `Hoy es *${now.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long' })}* y vence tu suscripción *Kaelus TV* 📺✨\n\n` +
-                    `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n\n` +
-                    `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
+        const mensaje = `🍿 Hola ${usuario.nombre}! 🙌\n\n` +
+                        `Hoy es *${fechaFormateada}* y vence tu suscripción *Kaelus TV* 📺✨\n\n` +
+                        `Con Kaelus TV sigues disfrutando de series, películas y televisión sin interrupciones 🎬🔥\n\n` +
+                        `¡No olvides realizar tu pago para seguir disfrutando de tus beneficios! 💳😉`;
 
         console.log(`➡️ Enviando mensaje a ${usuario.numero}`);
         await client.sendMessage(usuario.numero + '@c.us', mensaje);
@@ -249,6 +245,8 @@ cron.schedule('05 19 * * *', async () => { // todos los días a las 1:05 p.m. CD
   } catch (err) {
     console.error("❌ Error en cron Kaelus:", err);
   }
+}, {
+    timezone: "America/Mexico_City"
 });
 
 
