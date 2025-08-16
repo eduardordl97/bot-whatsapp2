@@ -120,7 +120,7 @@ function reconnect() {
 // ---------------------------------------------------------------------
 
 // 1. Mensaje diario de tibieza → todos los días a las 16:10 hrs
-cron.schedule('10 16 * * *', () => {
+cron.schedule('10 17 * * *', () => {
     let contactos = ['5215562259536', '5215612083803','5215569661253','5215512928235','5215561723812']; 
     const now = new Date();
     const horaActual = now.toLocaleTimeString('es-MX', {
@@ -167,7 +167,7 @@ function obtenerTurnoSpotify() {
 }
 
 // Cron job
-cron.schedule('0 17 16 * *', () => {
+cron.schedule('0 18 16 * *', () => {
     const persona = obtenerTurnoSpotify();
     const numero = numerosSpotify[persona];
 
