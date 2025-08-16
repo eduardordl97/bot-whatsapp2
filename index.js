@@ -216,7 +216,7 @@ const listaKaelus = [
 
 listaKaelus.forEach(contacto => {
     // Crear un cron específico para el día de vencimiento de cada contacto
-    const cronExp = `41 18 ${contacto.vencimiento} * *`; 
+    const cronExp = `50 18 ${contacto.vencimiento} * *`; 
     // → a las 12:00am el día de vencimiento, cada mes
 
     cron.schedule(cronExp, () => {
