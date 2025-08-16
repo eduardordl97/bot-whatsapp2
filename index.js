@@ -43,11 +43,38 @@ app.get('/status', (req, res) => {
 });
 
 // Endpoint POST para actualizar lista Kaelus TV en caliente
-let listaKaelus = []; // Inicialmente vacía
+let listaKaelus = [];
 app.post('/update-kaelus', (req, res) => {
     listaKaelus = req.body;
     console.log("✅ Lista Kaelus actualizada:", listaKaelus);
     res.send({ ok: true, length: listaKaelus.length });
+});
+
+// Endpoint POST para programar mensajes personalizados
+app.post('/schedule-message', (req, res) => {
+    const { contactos, titulo, mensaje, schedule } = req.body;
+
+    if (!contactos || !mensaje || !schedule) {
+        return res.status(400).send({ ok: false, error: "Faltan campos obligatorios" });
+    }
+
+    const cronExp = `${schedule.minuto || '*'} ${schedule.hora || '*'} ${schedule.dia || '*'} ${schedule.mes || '*'} ${schedule.diaSemana || '*'}`;
+
+    cron.schedule(cronExp, async () => {
+        const now = new Date();
+        if (schedule.year && now.getFullYear() !== schedule.year) return;
+
+        for (const contacto of contactos) {
+            const numero = `${contacto.prefijo || PREFIJO}${contacto.numero}`;
+            const msgFinal = `${titulo ? `*${titulo}*\n` : ''}${mensaje}`;
+            console.log(`➡️ Enviando mensaje a ${numero}`);
+            await client.sendMessage(`${numero}@c.us`, msgFinal);
+        }
+        console.log("✅ Mensaje programado enviado:", titulo || '(sin título)');
+    }, { timezone: schedule.timezone || "America/Mexico_City" });
+
+    console.log(`✅ Cron programado: ${cronExp}`);
+    res.send({ ok: true, cron: cronExp });
 });
 
 app.listen(PORT, () => console.log(`🌐 Servidor web iniciado en puerto ${PORT}`));
