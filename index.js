@@ -59,19 +59,37 @@ app.post('/update-kaelus', basicAuth, (req, res) => {
 
 // POST para programar mensajes dinámicos
 let mensajesProgramados = [];
+
 app.post('/schedule-message', basicAuth, (req, res) => {
     const { contactos, mensaje, minuto, hora, dia, mes } = req.body;
-    if (!contactos || !mensaje) return res.status(400).send({ ok: false, error: "Faltan datos" });
+    if (!contactos || !mensaje) 
+        return res.status(400).send({ ok: false, error: "Faltan datos" });
 
+    // Construir string de cron
     const cronStr = `${minuto || '*'} ${hora || '*'} ${dia || '*'} ${mes || '*'} *`;
+
+    // Programar el mensaje
     cron.schedule(cronStr, () => {
-        contactos.forEach(c => client.sendMessage(PREFIJO + c.numero + '@c.us', mensaje));
-        console.log(`📤 Mensaje enviado a ${contactos.length} contactos`);
+        const now = new Date();
+        const fechaFormateada = now.toLocaleDateString('es-MX');
+
+        contactos.forEach(c => {
+            // Reemplazar placeholders
+            const textoFinal = mensaje
+                .replace(/{nombre}/g, c.nombre)
+                .replace(/{fecha}/g, fechaFormateada);
+
+            client.sendMessage(PREFIJO + c.numero + '@c.us', textoFinal);
+        });
+
+        console.log(`📤 Mensaje enviado a ${contactos.length} contactos a las ${hora}:${minuto}`);
     }, { timezone: "America/Mexico_City" });
 
+    // Guardar info en memoria
     mensajesProgramados.push({ contactos, mensaje, cron: cronStr });
     res.send({ ok: true, total: mensajesProgramados.length });
 });
+
 
 // -----------------
 // Inicializar cliente WhatsApp
