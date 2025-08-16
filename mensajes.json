@@ -1,0 +1,28 @@
+[
+    {
+        "contactos": [
+            {
+                "nombre": "Eduardo",
+                "numero": "5562259536"
+            }
+        ],
+        "mensaje": "¡Hola! {nombre}!\n\nEste es un mensaje programado el día {fecha}\n\n¡Arriba el azul! 🌟",
+        "minuto": "34",
+        "hora": "15",
+        "dia": "*",
+        "mes": "*"
+    },
+    {
+        "contactos": [
+            {
+                "nombre": "Eduardo",
+                "numero": "5562259536"
+            }
+        ],
+        "mensaje": "¡Hola! 2 {nombre}!\n\nEste es un mensaje programado el día {fecha}\n\n¡Arriba el azul! 🌟",
+        "minuto": "35",
+        "hora": "15",
+        "dia": "*",
+        "mes": "*"
+    }
+]
